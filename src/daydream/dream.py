@@ -14,10 +14,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from seb_dream_rsi.policy import PolicySpec, build_policy
-from seb_dream_rsi.replay import replay
-from seb_dream_rsi.system1 import propose_spec
-from seb_dream_rsi.tree import DiscoveryTree
+from daydream.policy import PolicySpec, build_policy
+from daydream.replay import replay
+from daydream.system1 import propose_spec
+from daydream.tree import DiscoveryTree
 
 
 @dataclass

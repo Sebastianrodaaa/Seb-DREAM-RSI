@@ -1,4 +1,4 @@
-# Seb-DREAM-RSI
+# Daydream
 
 An independent implementation of [Dream-RSI: Recursive Self-Improvement through Evolving Worlds](https://arxiv.org/abs/2609.14858) (Zheng et al., 2026).
 
@@ -68,7 +68,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 
-seb-dream-rsi compare --task branch-world --rounds 2
+daydream compare --task branch-world --rounds 2
 pytest
 ```
 
@@ -93,22 +93,22 @@ Round 1 is the same policy by construction, as in the paper. From round 2 the dr
 Other tasks: `sum-diff`, `circle-packing`, `autocorrelation`, `lasso`, `kernel-layernorm`.
 
 ```bash
-seb-dream-rsi tasks
-seb-dream-rsi run --task sum-diff --rounds 2 --out runs/sum-diff
+daydream tasks
+daydream run --task sum-diff --rounds 2 --out runs/sum-diff
 ```
 
 `runs/sum-diff/history/` holds one JSON tree per round. `summary.json` holds the policy that ran, the policy selected for the next round, and the replay scores.
 
-To ask a chat model for the next artifact or the next policy spec, set `OPENAI_API_KEY` and, if needed, `OPENAI_BASE_URL`. The helpers are `LLMAgent` and `propose_policy_spec` in `seb_dream_rsi.agents`. The command line itself stays on the scripted agent so a clone runs without a key.
+To ask a chat model for the next artifact or the next policy spec, set `OPENAI_API_KEY` and, if needed, `OPENAI_BASE_URL`. The helpers are `LLMAgent` and `propose_policy_spec` in `daydream.agents`. The command line itself stays on the scripted agent so a clone runs without a key.
 
 ## Layout
 
-- `seb_dream_rsi.online` deploys a policy and records a tree.
-- `seb_dream_rsi.replay` reveals a subset of a stored tree.
-- `seb_dream_rsi.system1` proposes one adaptive policy from stored branch scores.
-- `seb_dream_rsi.dream` replays that proposal, and the revision grid only if it loses.
-- `seb_dream_rsi.loop` alternates those stages, or holds the policy fixed.
-- `seb_dream_rsi.tasks` are the evaluators and the fixed scripted agent.
+- `daydream.online` deploys a policy and records a tree.
+- `daydream.replay` reveals a subset of a stored tree.
+- `daydream.system1` proposes one adaptive policy from stored branch scores.
+- `daydream.dream` replays that proposal, and the revision grid only if it loses.
+- `daydream.loop` alternates those stages, or holds the policy fixed.
+- `daydream.tasks` are the evaluators and the fixed scripted agent.
 
 ## Citation
 

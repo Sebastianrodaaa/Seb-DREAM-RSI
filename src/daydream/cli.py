@@ -6,9 +6,9 @@ import argparse
 import json
 import sys
 
-from seb_dream_rsi.agents import ScriptedAgent
-from seb_dream_rsi.loop import RunResult, run_discovery
-from seb_dream_rsi.tasks import build_task, task_names
+from daydream.agents import ScriptedAgent
+from daydream.loop import RunResult, run_discovery
+from daydream.tasks import build_task, task_names
 
 
 def _print_result(result: RunResult) -> None:
@@ -87,7 +87,7 @@ def _compare(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="seb-dream-rsi",
+        prog="daydream",
         description="Replay discovery trees and improve the exploration policy.",
     )
     sub = parser.add_subparsers(dest="command", required=True)

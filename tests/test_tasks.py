@@ -2,12 +2,12 @@
 
 import pytest
 
-from seb_dream_rsi.policy import PolicySpec
-from seb_dream_rsi.tasks.autocorrelation import BINS, autoconvolution_peak
-from seb_dream_rsi.tasks.circle_packing import packing_is_valid, packing_score
-from seb_dream_rsi.tasks.kernels import LayerNormTask
-from seb_dream_rsi.tasks.lasso import LassoPathTask
-from seb_dream_rsi.tasks.sum_diff import sum_diff_gamma
+from daydream.policy import PolicySpec
+from daydream.tasks.autocorrelation import BINS, autoconvolution_peak
+from daydream.tasks.circle_packing import packing_is_valid, packing_score
+from daydream.tasks.kernels import LayerNormTask
+from daydream.tasks.lasso import LassoPathTask
+from daydream.tasks.sum_diff import sum_diff_gamma
 
 
 def test_arithmetic_progression_has_gamma_one():

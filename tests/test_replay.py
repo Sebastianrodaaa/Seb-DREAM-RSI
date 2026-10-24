@@ -1,12 +1,12 @@
 """Replay semantics from Zheng et al. 2026, Section 3."""
 
-from seb_dream_rsi.agents import ScriptedAgent
-from seb_dream_rsi.online import EvalResult, run_online
-from seb_dream_rsi.policy import PolicySpec, build_policy
-from seb_dream_rsi.replay import replay, replay_score
-from seb_dream_rsi.tasks.branch_world import BranchWorld
-from seb_dream_rsi.tree import DiscoveryTree
-from seb_dream_rsi.view import view_from_revealed
+from daydream.agents import ScriptedAgent
+from daydream.online import EvalResult, run_online
+from daydream.policy import PolicySpec, build_policy
+from daydream.replay import replay, replay_score
+from daydream.tasks.branch_world import BranchWorld
+from daydream.tree import DiscoveryTree
+from daydream.view import view_from_revealed
 
 
 class _Counting(BranchWorld):

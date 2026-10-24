@@ -3,12 +3,12 @@
 import json
 from pathlib import Path
 
-from seb_dream_rsi.agents import ScriptedAgent, parse_json_object
-from seb_dream_rsi.dream import improve_policy, mean_replay_score
-from seb_dream_rsi.loop import run_discovery
-from seb_dream_rsi.online import EvalResult, Proposal, run_online
-from seb_dream_rsi.policy import PolicySpec, build_policy, load_policy_file
-from seb_dream_rsi.tasks.branch_world import BranchWorld
+from daydream.agents import ScriptedAgent, parse_json_object
+from daydream.dream import improve_policy, mean_replay_score
+from daydream.loop import run_discovery
+from daydream.online import EvalResult, Proposal, run_online
+from daydream.policy import PolicySpec, build_policy, load_policy_file
+from daydream.tasks.branch_world import BranchWorld
 
 
 def _pair(rounds: int = 2):

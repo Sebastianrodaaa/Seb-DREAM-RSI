@@ -10,11 +10,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from seb_dream_rsi.dream import DreamOutcome, improve_policy
-from seb_dream_rsi.online import DiscoveryAgent, Evaluator, run_online
-from seb_dream_rsi.policy import PolicySpec, build_policy
-from seb_dream_rsi.storage import save_run
-from seb_dream_rsi.tree import DiscoveryTree
+from daydream.dream import DreamOutcome, improve_policy
+from daydream.online import DiscoveryAgent, Evaluator, run_online
+from daydream.policy import PolicySpec, build_policy
+from daydream.storage import save_run
+from daydream.tree import DiscoveryTree
 
 
 @dataclass

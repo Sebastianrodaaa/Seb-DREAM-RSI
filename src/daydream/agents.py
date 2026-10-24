@@ -15,8 +15,8 @@ import urllib.error
 import urllib.request
 from typing import Any, Protocol
 
-from seb_dream_rsi.online import Proposal
-from seb_dream_rsi.policy import PolicySpec
+from daydream.online import Proposal
+from daydream.policy import PolicySpec
 
 
 class ChatClient(Protocol):

@@ -1,11 +1,11 @@
 """Trusted local policy plugin.
 
-Load it with seb_dream_rsi.policy.load_policy_file. The runner imports this
+Load it with daydream.policy.load_policy_file. The runner imports this
 module in-process; write the file yourself rather than pointing the loader
 at model output.
 """
 
-from seb_dream_rsi.policy import ParallelRefinePolicy, PolicySpec
+from daydream.policy import ParallelRefinePolicy, PolicySpec
 
 POLICY = ParallelRefinePolicy(
     PolicySpec(

@@ -15,8 +15,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from seb_dream_rsi.policy import PolicySpec, _is_stagnant
-from seb_dream_rsi.tree import ROOT_ID, DiscoveryTree, Node
+from daydream.policy import PolicySpec, _is_stagnant
+from daydream.tree import ROOT_ID, DiscoveryTree, Node
 
 _MIN_GAIN = 0.02
 

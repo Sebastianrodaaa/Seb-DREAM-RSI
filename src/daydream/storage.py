@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from seb_dream_rsi.dream import DreamOutcome
+from daydream.dream import DreamOutcome
 
 
 def _write(path: Path, payload: dict[str, Any]) -> None:

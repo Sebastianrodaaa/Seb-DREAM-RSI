@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from seb_dream_rsi.tasks.autocorrelation import AutocorrelationTask
-from seb_dream_rsi.tasks.base import Task
-from seb_dream_rsi.tasks.branch_world import BranchWorld
-from seb_dream_rsi.tasks.circle_packing import CirclePackingTask
-from seb_dream_rsi.tasks.kernels import LayerNormTask
-from seb_dream_rsi.tasks.lasso import LassoPathTask
-from seb_dream_rsi.tasks.sum_diff import SumDiffTask
+from daydream.tasks.autocorrelation import AutocorrelationTask
+from daydream.tasks.base import Task
+from daydream.tasks.branch_world import BranchWorld
+from daydream.tasks.circle_packing import CirclePackingTask
+from daydream.tasks.kernels import LayerNormTask
+from daydream.tasks.lasso import LassoPathTask
+from daydream.tasks.sum_diff import SumDiffTask
 
 __all__ = ["Task", "build_task", "task_names"]
 

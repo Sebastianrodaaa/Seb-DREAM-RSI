@@ -1,5 +1,5 @@
 [project]
-name = "seb-dream-rsi"
+name = "daydream"
 version = "0.1.0"
 description = "Independent implementation of Dream-RSI: improve an exploration policy by replaying discovery trees."
 readme = "README.md"
@@ -11,7 +11,7 @@ dependencies = []
 dev = ["pytest>=8"]
 
 [project.scripts]
-seb-dream-rsi = "seb_dream_rsi.cli:main"
+daydream = "daydream.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]

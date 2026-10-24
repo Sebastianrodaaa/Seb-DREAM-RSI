@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from seb_dream_rsi.tree import ROOT_ID, DiscoveryTree, Node
+from daydream.tree import ROOT_ID, DiscoveryTree, Node
 
 
 @dataclass(frozen=True)

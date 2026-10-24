@@ -16,7 +16,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Protocol
 
-from seb_dream_rsi.view import TreeView
+from daydream.view import TreeView
 
 
 @dataclass(frozen=True)
@@ -191,7 +191,7 @@ def load_policy_file(path: str | Path) -> ExplorationPolicy:
     if not file_path.is_file():
         raise FileNotFoundError(file_path)
     module_spec = importlib.util.spec_from_file_location(
-        "seb_dream_rsi_user_policy", file_path
+        "daydream_user_policy", file_path
     )
     if module_spec is None or module_spec.loader is None:
         raise ImportError(f"cannot import {file_path}")

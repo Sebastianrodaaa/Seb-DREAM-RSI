@@ -14,8 +14,8 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from seb_dream_rsi.online import EvalResult, Proposal
-from seb_dream_rsi.policy import PolicySpec
+from daydream.online import EvalResult, Proposal
+from daydream.policy import PolicySpec
 
 _EPS = 1e-5
 _COSTS = {

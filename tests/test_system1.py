@@ -1,12 +1,12 @@
 """The fast policy model proposes one spec and skips the grid when it wins."""
 
-from seb_dream_rsi.agents import ScriptedAgent
-from seb_dream_rsi.dream import improve_policy, mean_replay_score
-from seb_dream_rsi.online import run_online
-from seb_dream_rsi.policy import PolicySpec, build_policy
-from seb_dream_rsi.system1 import propose_spec
-from seb_dream_rsi.tasks.branch_world import BranchWorld
-from seb_dream_rsi.tree import DiscoveryTree
+from daydream.agents import ScriptedAgent
+from daydream.dream import improve_policy, mean_replay_score
+from daydream.online import run_online
+from daydream.policy import PolicySpec, build_policy
+from daydream.system1 import propose_spec
+from daydream.tasks.branch_world import BranchWorld
+from daydream.tree import DiscoveryTree
 
 
 def _tree(branch_count: int, refine_depth: int):

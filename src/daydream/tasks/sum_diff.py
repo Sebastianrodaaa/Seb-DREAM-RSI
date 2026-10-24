@@ -12,8 +12,8 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from seb_dream_rsi.online import EvalResult, Proposal
-from seb_dream_rsi.policy import PolicySpec
+from daydream.online import EvalResult, Proposal
+from daydream.policy import PolicySpec
 
 # A published more-sums-than-differences example is included as one seed.
 # Other seeds are arithmetic or geometric so the branches are not alike.

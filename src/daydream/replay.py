@@ -16,9 +16,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from seb_dream_rsi.policy import ExplorationPolicy
-from seb_dream_rsi.tree import ROOT_ID, DiscoveryTree
-from seb_dream_rsi.view import sanitize_batch, view_from_revealed
+from daydream.policy import ExplorationPolicy
+from daydream.tree import ROOT_ID, DiscoveryTree
+from daydream.view import sanitize_batch, view_from_revealed
 
 
 @dataclass(frozen=True)

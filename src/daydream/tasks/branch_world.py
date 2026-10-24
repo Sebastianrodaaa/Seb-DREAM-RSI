@@ -14,8 +14,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from seb_dream_rsi.online import EvalResult, Proposal
-from seb_dream_rsi.policy import PolicySpec
+from daydream.online import EvalResult, Proposal
+from daydream.policy import PolicySpec
 
 
 def branch_score(branch_index: int, depth: int) -> float:

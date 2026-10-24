@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from seb_dream_rsi.online import EvalResult, Proposal
-from seb_dream_rsi.policy import PolicySpec
+from daydream.online import EvalResult, Proposal
+from daydream.policy import PolicySpec
 
 
 def packing_is_valid(circles: list[dict[str, float]], *, slack: float = 1e-9) -> bool:
