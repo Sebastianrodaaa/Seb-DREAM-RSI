@@ -39,6 +39,7 @@ def _run(args: argparse.Namespace) -> int:
         max_parallelism=args.parallelism,
         revisions=args.revisions,
         out_dir=args.out,
+        dreamer=args.dreamer,
     )
     if args.json:
         print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
@@ -59,6 +60,7 @@ def _compare(args: argparse.Namespace) -> int:
         rounds=args.rounds,
         max_parallelism=args.parallelism,
         revisions=args.revisions,
+        dreamer=args.dreamer,
     )
     dreamed = run_discovery(
         task.name,
@@ -70,6 +72,7 @@ def _compare(args: argparse.Namespace) -> int:
         max_parallelism=args.parallelism,
         revisions=args.revisions,
         out_dir=args.out,
+        dreamer=args.dreamer,
     )
     print("fixed exploration")
     _print_result(fixed)
@@ -95,6 +98,12 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--rounds", type=int, default=2)
     run_parser.add_argument("--parallelism", type=int, default=8)
     run_parser.add_argument("--revisions", type=int, default=12)
+    run_parser.add_argument(
+        "--dreamer",
+        default="auto",
+        choices=["auto", "system1", "grid"],
+        help="auto keeps a fast system-1 policy when it wins, and searches the grid otherwise",
+    )
     run_parser.add_argument("--out", default=None, help="directory for trees and summary.json")
     run_parser.add_argument("--json", action="store_true")
     run_parser.set_defaults(func=_run)
@@ -107,6 +116,12 @@ def build_parser() -> argparse.ArgumentParser:
     compare_parser.add_argument("--rounds", type=int, default=2)
     compare_parser.add_argument("--parallelism", type=int, default=8)
     compare_parser.add_argument("--revisions", type=int, default=12)
+    compare_parser.add_argument(
+        "--dreamer",
+        default="auto",
+        choices=["auto", "system1", "grid"],
+        help="auto keeps a fast system-1 policy when it wins, and searches the grid otherwise",
+    )
     compare_parser.add_argument("--out", default=None, help="write the Dream-RSI run here")
     compare_parser.set_defaults(func=_compare)
 

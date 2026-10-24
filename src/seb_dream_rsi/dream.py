@@ -5,9 +5,9 @@ current policy is candidate zero, so the selected policy's average replay
 score is at least as high as the policy it replaces. That is the monotonic
 selection rule in Section 3.
 
-The default dreamer is a deterministic revision schedule over the adaptive
-family. An optional chat-model dreamer may propose the same JSON spec. It
-cannot return executable Python.
+The default dreamer asks the system-1 model for one adaptive spec and keeps
+it when the replay score wins. The revision grid runs only as a fallback, or
+when the caller asks for it. Neither path executes model-written Python.
 """
 
 from __future__ import annotations
@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 
 from seb_dream_rsi.policy import PolicySpec, build_policy
 from seb_dream_rsi.replay import replay
+from seb_dream_rsi.system1 import propose_spec
 from seb_dream_rsi.tree import DiscoveryTree
 
 
@@ -102,6 +103,16 @@ def revision_schedule(incumbent: PolicySpec, limit: int) -> list[PolicySpec]:
     return specs
 
 
+def _decision_key(spec: PolicySpec) -> tuple:
+    return (
+        spec.family,
+        spec.branch_count,
+        spec.refine_depth,
+        spec.patience,
+        spec.min_gain,
+    )
+
+
 def improve_policy(
     incumbent: PolicySpec,
     trees: list[DiscoveryTree],
@@ -112,9 +123,16 @@ def improve_policy(
     lambda_cost: float = 0.002,
     lambda_parallel: float = 0.005,
     extra_specs: list[PolicySpec] | None = None,
+    dreamer: str = "auto",
 ) -> DreamOutcome:
-    """Score the incumbent and later revisions. Keep the best average."""
+    """Score the incumbent, then a fast proposal, then the grid if needed.
 
+    `auto` keeps the system-1 spec when it wins and skips the revision grid.
+    `system1` never searches the grid. `grid` is the full schedule.
+    """
+
+    if dreamer not in {"auto", "system1", "grid"}:
+        raise ValueError("dreamer must be 'auto', 'system1', or 'grid'")
     kwargs = {
         "max_rounds": max_rounds,
         "max_parallelism": max_parallelism,
@@ -124,11 +142,27 @@ def improve_policy(
     best_spec = incumbent
     best_score = mean_replay_score(incumbent, trees, **kwargs)
     trace = [{"spec": incumbent.to_dict(), "score": best_score, "role": "incumbent"}]
-    candidates = list(extra_specs or []) + revision_schedule(incumbent, revisions)
-    for spec in candidates:
+    seen = {_decision_key(incumbent)}
+
+    def consider(spec: PolicySpec, role: str) -> None:
+        nonlocal best_spec, best_score
+        key = _decision_key(spec)
+        if key in seen:
+            return
+        seen.add(key)
         score = mean_replay_score(spec, trees, **kwargs)
-        trace.append({"spec": spec.to_dict(), "score": score, "role": "revision"})
+        trace.append({"spec": spec.to_dict(), "score": score, "role": role})
         if score > best_score + 1e-12:
             best_score = score
             best_spec = spec
+
+    fast_won = False
+    if dreamer in {"auto", "system1"}:
+        consider(propose_spec(incumbent, trees), "system1")
+        fast_won = best_spec is not incumbent
+    for spec in extra_specs or []:
+        consider(spec, "revision")
+    if dreamer == "grid" or (dreamer == "auto" and not fast_won):
+        for spec in revision_schedule(incumbent, revisions):
+            consider(spec, "revision")
     return DreamOutcome(spec=best_spec, score=best_score, trace=trace)

@@ -75,6 +75,7 @@ def run_discovery(
     lambda_parallel: float = 0.005,
     out_dir: str | None = None,
     extra_specs: list[PolicySpec] | None = None,
+    dreamer: str = "auto",
 ) -> RunResult:
     if mode not in {"dream", "fixed"}:
         raise ValueError("mode must be 'dream' or 'fixed'")
@@ -113,6 +114,7 @@ def run_discovery(
                 lambda_cost=lambda_cost,
                 lambda_parallel=lambda_parallel,
                 extra_specs=extra_specs,
+                dreamer=dreamer,
             )
             spec = last_dream.spec
             dream_score = last_dream.score

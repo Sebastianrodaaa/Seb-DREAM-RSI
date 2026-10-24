@@ -14,7 +14,7 @@ The same policy interface is used in two places.
 
 1. **Online explore.** The current policy picks a batch of branches to continue. A fixed discovery agent proposes a candidate from each parent, and a fixed evaluator scores it. The policy code does not change during the rollout.
 2. **Construct a replay simulator.** The finished tree is appended to a pool. Replaying another policy only reveals nodes that are already stored. The agent and the evaluator are not called.
-3. **Dream a better policy.** Several revisions of the policy are scored on every tree in the pool. The score from Section 3 is
+3. **Dream a better policy.** A fast model reads the stored branches and proposes one adaptive policy. That proposal is kept when its replay score wins; otherwise a small grid of revisions is scored. The score in this repository is
 
    `quality − λ_cost · attempts + λ_parallel · attempts / max(1, rounds)`
 
@@ -44,7 +44,7 @@ flowchart LR
 | Optional OpenAI-compatible chat client for proposals and policy specs | Yes, off unless you opt in |
 | The authors' Gemini CLI harness, KernelBench GPU runs, and the discovered C++ solver | No |
 
-The default dreamer searches a deterministic family of policies. It does not execute model-written Python. A policy module you wrote yourself can be loaded from disk; see `examples/narrow_policy.py`.
+The default dreamer is `system1`: one pass over the recorded branches, then a replay check. `--dreamer grid` scores the full revision schedule instead. Neither path executes model-written Python. A policy module you wrote yourself can be loaded from disk; see `examples/narrow_policy.py`.
 
 ## Assumptions
 
@@ -83,7 +83,7 @@ round   calls     cum      best  policy
 dream-rsi
 round   calls     cum      best  policy
     1      48      48    0.9500  parallel_refine
-    2      16      64    0.9500  adaptive-w4-d4-p4-g0.02
+    2      16      64    0.9500  adaptive-w4-d4-p3-g0.02
 
 dream used 1.50x fewer discovery-agent calls
 ```
@@ -105,7 +105,8 @@ To ask a chat model for the next artifact or the next policy spec, set `OPENAI_A
 
 - `seb_dream_rsi.online` deploys a policy and records a tree.
 - `seb_dream_rsi.replay` reveals a subset of a stored tree.
-- `seb_dream_rsi.dream` scores revisions and keeps the best average.
+- `seb_dream_rsi.system1` proposes one adaptive policy from stored branch scores.
+- `seb_dream_rsi.dream` replays that proposal, and the revision grid only if it loses.
 - `seb_dream_rsi.loop` alternates those stages, or holds the policy fixed.
 - `seb_dream_rsi.tasks` are the evaluators and the fixed scripted agent.
 
