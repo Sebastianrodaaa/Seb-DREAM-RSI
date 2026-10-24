@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/logo.png" alt="Daydream logo. A pale discovery tree on indigo: two side branches fade out, the center branch ends in an amber node, and a dotted arc closes the replay loop." width="148">
-</p>
-
 <h1 align="center">Daydream</h1>
 
 <p align="center">
