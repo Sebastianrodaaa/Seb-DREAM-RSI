@@ -1,8 +1,8 @@
-"""Replay simulator.
+"""Replay search environment.
 
-Replaying a policy walks a completed discovery tree. Every outcome it reads
-was stored when the node was first evaluated. The discovery agent and the
-evaluator are not called.
+``probe_batch`` is the replay half of ``daydream.env.solve``. Every outcome it
+reads was stored when the node was first evaluated. The discovery agent and
+the evaluator are not called.
 
 Score, from Section 3 of Zheng et al. 2026:
 
@@ -16,9 +16,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from daydream.env import solve
 from daydream.policy import ExplorationPolicy
 from daydream.tree import ROOT_ID, DiscoveryTree
-from daydream.view import sanitize_batch, view_from_revealed
+from daydream.view import TreeView, view_from_revealed
 
 
 @dataclass(frozen=True)
@@ -64,6 +65,30 @@ def _reveal(tree: DiscoveryTree, revealed: set[str], action: str) -> str | None:
     return None
 
 
+class ReplayEnv:
+    """Frozen tree. Legal roots are unopened recorded branches, not planned slots."""
+
+    def __init__(self, tree: DiscoveryTree) -> None:
+        self.tree = tree
+        self.revealed: set[str] = {ROOT_ID}
+
+    def finished(self) -> bool:
+        return len(self.revealed) >= len(self.tree.nodes)
+
+    def view(self, branch_count: int) -> TreeView:
+        del branch_count
+        return view_from_revealed(self.tree, self.revealed)
+
+    def probe_batch(self, batch: list[str]) -> bool:
+        revealed_any = False
+        for action in batch:
+            node_id = _reveal(self.tree, self.revealed, action)
+            if node_id is not None and node_id not in self.revealed:
+                self.revealed.add(node_id)
+                revealed_any = True
+        return revealed_any
+
+
 def replay(
     policy: ExplorationPolicy,
     tree: DiscoveryTree,
@@ -73,28 +98,11 @@ def replay(
     lambda_cost: float = 0.002,
     lambda_parallel: float = 0.005,
 ) -> ReplayResult:
-    policy.reset()
-    revealed: set[str] = {ROOT_ID}
-    rounds = 0
-    while rounds < max_rounds and len(revealed) < len(tree.nodes):
-        view = view_from_revealed(tree, revealed)
-        batch = sanitize_batch(
-            list(policy.select_batch(view, max_parallelism)),
-            view,
-            max_parallelism,
-        )
-        if not batch:
-            break
-        revealed_any = False
-        for action in batch:
-            node_id = _reveal(tree, revealed, action)
-            if node_id is not None and node_id not in revealed:
-                revealed.add(node_id)
-                revealed_any = True
-        rounds += 1
-        if not revealed_any:
-            break
-
+    env = ReplayEnv(tree)
+    rounds = solve(
+        policy, env, max_rounds=max_rounds, max_parallelism=max_parallelism
+    )
+    revealed = env.revealed
     attempts = [tree.nodes[node_id] for node_id in revealed if node_id != ROOT_ID]
     quality = max((node.score or 0.0) for node in attempts) if attempts else 0.0
     best_node_id = None

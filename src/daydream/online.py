@@ -1,11 +1,10 @@
-"""Online rollout.
+"""Live search environment.
 
-The policy's code stays fixed for the rollout. Each decision picks a batch of
-parents. The discovery agent proposes one child per parent and the evaluator
-scores it. Within a batch the attempts do not see each other.
-
-Batches run in selection order so a seed fully determines the tree. The batch
-size is still the parallelism the policy is charged for during replay.
+``probe_batch`` is the live half of ``daydream.env.solve``. The policy's code
+stays fixed for the rollout. Each selected parent becomes one child: the
+discovery agent proposes it and the evaluator scores it. Attempts in one batch
+do not see each other. They run in selection order so a seed determines the
+tree. The batch size is still the parallelism replay charges for.
 """
 
 from __future__ import annotations
@@ -13,9 +12,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
+from daydream.env import solve
 from daydream.policy import ExplorationPolicy
 from daydream.tree import ROOT_ID, DiscoveryTree
-from daydream.view import sanitize_batch, view_from_online
+from daydream.view import TreeView, view_from_online
 
 
 @dataclass(frozen=True)
@@ -81,49 +81,52 @@ def _resolve(tree: DiscoveryTree, action: str) -> tuple[str, int, int]:
     return action, node.branch_index, node.depth + 1
 
 
-def run_online(
-    policy: ExplorationPolicy,
-    agent: DiscoveryAgent,
-    evaluator: Evaluator,
-    *,
-    max_rounds: int = 64,
-    max_parallelism: int = 8,
-) -> DiscoveryTree:
-    tree = DiscoveryTree.new()
-    policy.reset()
-    for _ in range(max_rounds):
-        view = view_from_online(tree, policy.spec.branch_count)
-        batch = sanitize_batch(
-            list(policy.select_batch(view, max_parallelism)),
-            view,
-            max_parallelism,
-        )
-        if not batch:
-            break
+class LiveEnv:
+    """Growing tree. The grid is not preallocated; an empty batch is the stop."""
+
+    def __init__(self, agent: DiscoveryAgent, evaluator: Evaluator) -> None:
+        self.agent = agent
+        self.evaluator = evaluator
+        self.tree = DiscoveryTree.new()
+
+    def finished(self) -> bool:
+        return False
+
+    def view(self, branch_count: int) -> TreeView:
+        return view_from_online(self.tree, branch_count)
+
+    def probe_batch(self, batch: list[str]) -> bool:
         planned: list[tuple[str, int, int, list[dict[str, Any]]]] = []
         for action in batch:
-            parent_id, branch_index, depth = _resolve(tree, action)
+            parent_id, branch_index, depth = _resolve(self.tree, action)
             planned.append(
-                (parent_id, branch_index, depth, _trajectory_payload(tree, parent_id))
+                (
+                    parent_id,
+                    branch_index,
+                    depth,
+                    _trajectory_payload(self.tree, parent_id),
+                )
             )
         for parent_id, branch_index, depth, trajectory in planned:
             parent_artifact = (
                 {}
                 if parent_id == ROOT_ID
-                else dict(tree.nodes[parent_id].artifact)
+                else dict(self.tree.nodes[parent_id].artifact)
             )
             try:
-                proposal = agent.propose(
+                proposal = self.agent.propose(
                     parent_artifact,
                     branch_index=branch_index,
                     depth=depth,
                     trajectory=trajectory,
                 )
-                result = evaluator.evaluate(proposal.artifact)
+                result = self.evaluator.evaluate(proposal.artifact)
             except Exception as exc:  # a failed attempt is a node, not a crash
                 proposal = Proposal(artifact={"error": str(exc)}, proposal="failed attempt")
-                result = EvalResult(score=0.0, valid=False, error=f"{type(exc).__name__}: {exc}")
-            tree.add_child(
+                result = EvalResult(
+                    score=0.0, valid=False, error=f"{type(exc).__name__}: {exc}"
+                )
+            self.tree.add_child(
                 parent_id,
                 branch_index=branch_index,
                 score=float(result.score),
@@ -133,4 +136,17 @@ def run_online(
                 error=result.error,
                 proposal=proposal.proposal,
             )
-    return tree
+        return True
+
+
+def run_online(
+    policy: ExplorationPolicy,
+    agent: DiscoveryAgent,
+    evaluator: Evaluator,
+    *,
+    max_rounds: int = 64,
+    max_parallelism: int = 8,
+) -> DiscoveryTree:
+    env = LiveEnv(agent, evaluator)
+    solve(policy, env, max_rounds=max_rounds, max_parallelism=max_parallelism)
+    return env.tree

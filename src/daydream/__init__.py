@@ -2,8 +2,8 @@
 
 Dream-RSI (Zheng et al., 2026) improves an exploration policy by replaying
 completed discovery trees instead of rerunning the discovery agent. This
-package implements that loop. It is not the authors' unreleased codebase
-and is not affiliated with them.
+package implements that loop. It is not the authors' code and is not
+affiliated with them.
 """
 
 from daydream.loop import RunResult, run_discovery

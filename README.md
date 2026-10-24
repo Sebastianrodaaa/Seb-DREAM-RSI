@@ -82,14 +82,15 @@ flowchart LR
   end
 ```
 
-Both modes share one decision interface, `select_batch`. Online mode turns each choice into a new evaluated node. Replay mode turns the same choice into a reveal of a node that is already on disk.
+Both modes call `daydream.env.solve`. The policy still only sees a tree view and returns a batch through `select_batch`. Live mode turns that batch into evaluated nodes. Replay mode reveals nodes already on the tree. That is the released runner's split: one `solve(env)`, two environment modes, no second interpreter.
 
 ```mermaid
 flowchart LR
   view[Tree view of the revealed prefix]
   view --> policy[select_batch]
-  policy --> onlinePath[Online: agent proposes, evaluator scores, node is stored]
-  policy --> replayPath[Replay: stored child is revealed, agent stays idle]
+  policy --> solve[env.solve]
+  solve --> onlinePath[Live: agent proposes, evaluator scores, node is stored]
+  solve --> replayPath[Replay: stored child is revealed, agent stays idle]
 ```
 
 ### One round
@@ -247,8 +248,9 @@ daydream run --task sum-diff --rounds 2 --out runs/sum-diff
 
 | Module | Responsibility |
 | --- | --- |
-| `daydream.online` | Deploy a policy and record a tree. |
-| `daydream.replay` | Reveal a subset of a stored tree and score that walk. |
+| `daydream.env` | The one search loop, `solve`. Live and replay only differ in `probe_batch`. |
+| `daydream.online` | Live environment: a batch becomes evaluated nodes. |
+| `daydream.replay` | Replay environment: a batch reveals stored nodes, then the Section 3 score. |
 | `daydream.system1` | Propose one adaptive spec from stored branch scores. |
 | `daydream.dream` | Accept that proposal when it wins, otherwise score the revision grid. |
 | `daydream.loop` | Alternate online rounds and dreaming, or hold the policy fixed. |
